@@ -193,3 +193,34 @@ def c7_decrypt_AES_ECB(file_name, key):
 	f.close()
 	return cipher.decrypt(cipher_text)
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+# Challenge 8: Detect AES in ECB mode
+def c8_detect_AES_in_ECB_print(file_name):
+	line = c8_detect_AES_in_ECB(file_name)
+	return hexlify(line[1]).decode(SCHEME)
+
+def c8_detect_AES_in_ECB(file_name):
+	f = open(file_name)
+	top_score = -1
+	top_message = ''
+	line_number = -1
+	index = 1
+	for line in f:
+		line = line.rstrip("\n")
+		b_line = unhexlify(line)
+		blocks = [b_line[i:i+16] for i in range(0, len(b_line), 16)]
+		pairs = itertools.combinations(blocks, 2)
+		score = 0
+		for p in pairs:
+			if p[0] == p[1]:
+				score += 1
+		if score > top_score:
+			top_score = score
+			top_message = b_line
+			line_number = index
+		index += 1
+		
+	f.close()
+	return (line_number, top_message)
+
